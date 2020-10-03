@@ -1,0 +1,65 @@
+package restapi.service;
+
+import java.time.LocalDate;
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+import restapi.dao.ProductDao;
+import restapi.domain.Product;
+import restapi.dto.ProductDto;
+import restapi.mapper.ProductMapper;
+
+@Service
+public class ProductServiceImpl implements ProductService {
+  
+  private final ProductDao dao;
+  
+  public  ProductServiceImpl(ProductDao dao) {
+    this.dao = dao;
+  }
+
+  @Override
+  public List<ProductDto> findAll() {
+    return ProductMapper.MAPPER.fromProductList(dao.findAll());
+  }
+
+  @Override
+  public ProductDto findById(Integer id) {
+    return ProductMapper.MAPPER.fromProduct(dao.findById(id).orElse(null));
+  }
+
+  @Override
+  public List<ProductDto> findByExpiredDateLessThanEqual(String expiredDate) {
+    return ProductMapper.MAPPER
+        .fromProductList(dao.findByExpiredDateLessThanEqual(LocalDate.parse(expiredDate)));
+  }
+  
+  @Override
+  public List<ProductDto> findByExpiredDateLessThanEqual(LocalDate expiredDate) {
+    return ProductMapper.MAPPER
+        .fromProductList(dao.findByExpiredDateLessThanEqual(expiredDate));
+  }
+  
+  @Override
+  public List<ProductDto> findByCostBetween(Double min, Double max) {
+    return ProductMapper.MAPPER.fromProductList(dao.findByCostBetween(min, max));
+  }
+
+  @Override
+  public ProductDto save(ProductDto dto) {
+    Product p = ProductMapper.MAPPER.toProduct(dto);
+    return ProductMapper.MAPPER.fromProduct(dao.save(p));
+  }
+
+  @Override
+  public void removeById(Integer id) {
+    dao.deleteById(id);
+  }
+
+  @Override
+  public boolean existsById(Integer id) {
+    return dao.existsById(id);
+  }
+
+}
